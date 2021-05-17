@@ -73,13 +73,11 @@ cd ${BUILD_DIR}
 cmake .. -DCMAKE_INSTALL_PREFIX=..
 make -j ${BUILD_JOBS:-4}
 
-. ${MYDIR}/${ENV_FILE}_DA
-cd ${BUILD_DIR}
-mkdir -p build_gsi
-cd build_gsi
-cmake ${MYDIR}/src/gsi -DBUILD_CORELIBS=ON -DCMAKE_INSTALL_PREFIX=.
-make -j ${BUILD_JOBS:-4}
-cp ./bin/gsi.x ${MYDIR}/bin/.
+cd ${MYDIR}/src/gsi/ush
+./build_all_cmake.sh
+cp ${MYDIR}/src/gsi/exec/global_gsi.x ${MYDIR}/bin/gsi.x
+
+exit
 
 . ${MYDIR}/${ENV_FILE}_DA
 cd ${BUILD_DIR}
