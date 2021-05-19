@@ -308,7 +308,7 @@ actions to fully update the system.
 # Contact Info
 
 For questions related to code management, contributing to the AVID
-real-time runs, or running real-time runs:
+real-time RRFS ensemble runs, or running real-time RRFS ensemble runs:
 
 | Name | Email |
 | ---- | :---- |
