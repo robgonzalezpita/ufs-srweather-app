@@ -28,20 +28,26 @@ This branch supports the following features:
 # Repo Directory Structure
 
 The following is the directory structure of the ufs-srweather-app and
-regional_workflow repositories.
+regional_workflow repositories. The directories in parentheses are created 
+after executing the build process.
 
     ufs-srweather-app/
     ├── docs
     │   └── UsersGuide
     ├── env               # Files to set environment on supported platforms
-    ├── exec              # Installed executables
+    ├── (bin)             # Installed executables
+    ├── (build)           # Intermediate build/installation files
     ├── manage_externals  # Utility for gathering git submodules
+    ├── (include)         # Installed libraries
+    ├── (share)           # Static files
+    ├── (lib)             # Installed libraries
+    ├── python_graphics   # Python graphics related files
     ├── regional_workflow # See details below.
     └── src               # Source code
         ├── EMC_post
-        ├── logs
-        ├── UFS_UTILS_chgres_grib2
-        ├── UFS_UTILS_develop
+        ├── gsi     
+        ├── rrfs_utl
+        ├── UFS_UTILS
         └── ufs_weather_model
 
     regional_workflow/
@@ -85,20 +91,7 @@ Building need be done only once if no source code is changed.
 ```
     ./manage_externals/checkout_externals
 ```
-- Source the build environment (must be in bash shell)
-```
-    bash # If your default shell is not bash
-    source /etc/profile.d/modules.sh
-    source env/build_jet_intel.env
-```
-- Build the code for UFS_UTILS, ufs_weather_model, and UPP only(from top level SRW App).
-```
-    mkdir build
-    cd build
-    cmake .. -DCMAKE_INSTALL_PREFIX=..
-    make -j 4 2>&1 | tee build.log
-```
-- You can also use devbuild.sh to build all the code including data assimilation components (from top level SRW App).
+- Build the code by using devbuild.sh to build all the code including data assimilation components (from top level SRW App).
 ```
     On Jet        :   devbuild.sh jet intel 
     On Hera       :   devbuild.sh hera intel 
