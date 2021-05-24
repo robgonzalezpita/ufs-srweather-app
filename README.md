@@ -18,12 +18,13 @@ other RDHPCS platforms.
 
 This branch supports the following features:
 
- - Real-time support in the XML
- - A real-time config file.
- - NCL Graphics Rocoto jobs, jobs, and scripts for the web graphics
+ - Real-time support in the XML (with the option to run in non-realtime mode)
+ - A real-time config file (with the option to run in non-realtime mode).
+ - NCL/Python graphics Rocoto jobs and scripts for the web graphics
  - A slight modification on the standard NCO configuration for logs
  - Additional grib2 files
  - A different vertical configuration -- L65_20mb
+ - Data Assimilation (GSI)
 
 # Repo Directory Structure
 
@@ -83,15 +84,15 @@ Building need be done only once if no source code is changed.
 
 - Clone the ufs-srweather-app repository.
 ```
-    git clone https://github.com/NOAA-GSL/ufs-srweather-app.git gsl-srweather-app
-    cd gsl-srweather-app
+    git clone https://github.com/NOAA-GSL/ufs-srweather-app.git 
+    cd ufs-srweather-app
     git checkout RRFS_ens
 ```
-- And retrieve the externals.
+- And retrieve the externals, according to what is specified in Externals.cfg.
 ```
     ./manage_externals/checkout_externals
 ```
-- Build the code by using devbuild.sh to build all the code including data assimilation components (from top level SRW App).
+- Build the code by using devbuild.sh, including data assimilation components (from top level SRW App).
 ```
     On Jet        :   devbuild.sh jet intel 
     On Hera       :   devbuild.sh hera intel 
@@ -135,6 +136,11 @@ You will also likely want to change the dates over which to run:
     DATE_FIRST_CYCL
     DATE_LAST_CYCL
 
+For real-time RRFSE runs on Jet, the forecast length for 00Z and 12Z are different. Therefore, two additional settings are needed:
+    
+    FCST_LEN_HRS_00Z
+    FCST_LEN_HRS_12Z
+
 The run can be configured to be real-time by setting:
 
     RUN_REALTIME=TRUE   : in real-time mode; default is FALSE (retro mode)
@@ -147,7 +153,7 @@ The following lines have the ensemble settings:
 
     DO_ENSEMBLE=TRUE     : run the workflow in ensemble mode
     NUM_ENS_MEMBERS=9    : ensemble size
-    DO_SPPT=TRUE         : SPPT as the ensemble method
+    DO_SPPT=TRUE         : SPPT as the stochastic physics method
     SPPT_MAG=0.5         : magnitude of SPPT
     RUN_CONTROL=TRUE     : member 1 will be run as the control member, no stochastic physics
 
@@ -231,7 +237,7 @@ the repository structures are "pull only".
 Changes to the real-time runs should be made through the Pull Request
 process and subsequently pulled into the relevant repositories upon
 successfully merging with the appropriate feature branch, e.g.
-feature/RRFS_ens in the regional_workflow repository.
+RRFS_ens in the regional_workflow repository.
 
 Minor hot fixes are allowed to be made in-place for the real-time runs,
 especially since many setting will be a result of the configuration
