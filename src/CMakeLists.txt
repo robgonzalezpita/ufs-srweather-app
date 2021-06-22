@@ -8,7 +8,7 @@ ExternalProject_Add(UFS_UTILS
   )
 
 if(NOT CCPP_SUITES)
-  set(CCPP_SUITES "rrfs_gfsv16,FV3_GFS_v15_thompson_mynn,nssl_mp_no_nsst")
+  set(CCPP_SUITES "rrfs_gfsv16,rrfs_thompson_mynn,nssl_mp_no_nsst")
 endif()
 
 ExternalProject_Add(ufs_weather_model
