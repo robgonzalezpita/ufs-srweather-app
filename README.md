@@ -234,7 +234,7 @@ actions to fully update the system.
 ### Changes to a configuration setting.
 
 - The changes should be committed as changes to the configuration
-  file(s), potentially config.sh.RRFS_dev2 and config.sh.RRFS_AK_dev2.
+  file(s), potentially config.sh.RRFS_dev2 and config.sh.RRFS_AK_dev1.
 - It's a good idea to go through a PR first for these settings since so
   many of them have repercussions to XML and scripts.
 - For minor changes, a manual update of the var_defns.sh file to reflect
