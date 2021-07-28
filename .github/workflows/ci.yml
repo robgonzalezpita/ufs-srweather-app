@@ -1,0 +1,29 @@
+name: Example CI for RFFS_CI 
+
+on:
+  push:
+      branches: [rrfs_ci_simple]
+  pull_request:
+    branches: [ develop ]
+  workflow_dispatch:
+
+jobs: 
+  run-shell-command:
+    runs-on: ubuntu-latest
+    steps:
+      
+      # Update 
+      - name: Update 
+        run: sudo apt-get update -y
+
+      # Install Cowsay 
+      - name: Install Cowsay 
+        run: sudo apt-get install -y cowsay
+
+      # Install Fortune
+      - name: Install Fortune
+        run: sudo apt-get install fortune
+
+      # Print Cowsay 
+      - name: Cow Say
+        run: fortune | cowsay 
