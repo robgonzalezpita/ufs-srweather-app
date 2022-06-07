@@ -1,0 +1,35 @@
+#%Module
+
+proc ModulesHelp { } {
+   puts stderr "This module loads libraries for building SRW on"
+   puts stderr "the NOAA RDHPC machine Hera using Intel-18.0.5.274"
+}
+
+module-whatis "Loads libraries needed for building SRW on Hera"
+
+module use /scratch1/NCEPDEV/nems/emc.nemspara/soft/modulefiles
+module load miniconda3/3.7.3
+
+module use /contrib/sutils/modulefiles
+module load sutils
+
+module load cmake/3.20.1
+
+module use /scratch2/NCEPDEV/nwprod/hpc-stack/libs/hpc-stack/modulefiles/stack
+
+module load hpc/1.1.0
+module load hpc-intel/18.0.5.274
+module load hpc-impi/2018.0.4
+
+module load srw_common
+
+module unload fms
+module load fms/2021.03-avx
+
+setenv CMAKE_C_COMPILER mpiicc
+setenv CMAKE_CXX_COMPILER mpiicpc
+setenv CMAKE_Fortran_COMPILER mpiifort
+setenv CMAKE_Platform hera.intel
+
+# use shared memory and OpenFabrics Alliance (OFA) fabric with Intel MPI to circumvent RDMA-related bug in DAPL.
+setenv I_MPI_Platform shm:ofa
