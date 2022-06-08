@@ -3,15 +3,15 @@
 # usage instructions
 usage () {
 cat << EOF_USAGE
-Usage: $0 [OPTIONS]...
+Usage: $0 --platform=PLATFORM [OPTIONS]...
 
 OPTIONS
   -h, --help
       show this help guide
-  --platform=PLATFORM
+  -p, --platform=PLATFORM
       name of machine you are building on
       (e.g. cheyenne | hera | jet | orion | wcoss_dell_p3)
-  --compiler=COMPILER
+  -c, --compiler=COMPILER
       compiler to use; default depends on platform
       (e.g. intel | gnu | cray | gccgfortran)
   --app=APPLICATION
@@ -93,8 +93,6 @@ BUILD_JOBS=4
 CLEAN=false
 CONTINUE=false
 VERBOSE=false
-# detect PLATFORM (MACHINE)
-source ${SRC_DIR}/env/detect_machine.sh
 
 # process required arguments
 if [[ ("$1" == "--help") || ("$1" == "-h") ]]; then
@@ -106,10 +104,10 @@ fi
 while :; do
   case $1 in
     --help|-h) usage; exit 0 ;;
-    --platform=?*) PLATFORM=${1#*=} ;;
-    --platform|--platform=) usage_error "$1 requires argument." ;;
-    --compiler=?*) COMPILER=${1#*=} ;;
-    --compiler|--compiler=) usage_error "$1 requires argument." ;;
+    --platform=?*|-p=?*) PLATFORM=${1#*=} ;;
+    --platform|--platform=|-p|-p=) usage_error "$1 requires argument." ;;
+    --compiler=?*|-c=?*) COMPILER=${1#*=} ;;
+    --compiler|--compiler=|-c|-c=) usage_error "$1 requires argument." ;;
     --app=?*) APPLICATION=${1#*=} ;;
     --app|--app=) usage_error "$1 requires argument." ;;
     --ccpp=?*) CCPP=${1#*=} ;;
@@ -138,17 +136,32 @@ while :; do
   shift
 done
 
+# check if PLATFORM is set
+if [ -z $PLATFORM ] ; then
+  printf "\nERROR: Please set PLATFORM.\n\n"
+  usage
+  exit 0
+fi
+
+# set PLATFORM (MACHINE)
+MACHINE="${PLATFORM}"
+printf "PLATFORM(MACHINE)=${PLATFORM}\n" >&2
+
 set -eu
 
 # automatically determine compiler
 if [ -z "${COMPILER}" ] ; then
   case ${PLATFORM} in
-    jet|hera) COMPILER=intel ;;
+    jet|hera|gaea) COMPILER=intel ;;
     orion) COMPILER=intel ;;
     wcoss_dell_p3) COMPILER=intel ;;
     cheyenne) COMPILER=intel ;;
-    macos) COMPILER=gccgfortran ;;
-    *) printf "ERROR: Unknown platform ${PLATFORM}\n" >&2; usage >&2; exit 1 ;;
+    macos,singularity) COMPILER=gnu ;;
+    odin) COMPILER=intel ;;
+    *)
+      COMPILER=intel
+      printf "WARNING: Setting default COMPILER=intel for new platform ${PLATFORM}\n" >&2;
+      ;;
   esac
 fi
 
@@ -159,18 +172,19 @@ if [ "${VERBOSE}" = true ] ; then
   settings
 fi
 
-# set ENV_FILE for this platform/compiler combination
-ENV_FILE="${SRC_DIR}/env/build_${PLATFORM}_${COMPILER}.env"
-if [ ! -f "${ENV_FILE}" ]; then
-  printf "ERROR: environment file does not exist for platform/compiler\n" >&2
-  printf "  ENV_FILE=${ENV_FILE}\n" >&2
+# set MODULE_FILE for this platform/compiler combination
+MODULE_FILE="build_${PLATFORM}_${COMPILER}"
+if [ ! -f "${SRC_DIR}/modulefiles/${MODULE_FILE}" ]; then
+  printf "ERROR: module file does not exist for platform/compiler\n" >&2
+  printf "  MODULE_FILE=${MODULE_FILE}\n" >&2
   printf "  PLATFORM=${PLATFORM}\n" >&2
   printf "  COMPILER=${COMPILER}\n\n" >&2
+  printf "Please make sure PLATFORM and COMPILER are set correctly\n" >&2
   usage >&2
   exit 64
 fi
 
-printf "ENV_FILE=${ENV_FILE}\n" >&2
+printf "MODULE_FILE=${MODULE_FILE}\n" >&2
 
 # if build directory already exists then exit
 if [ "${CLEAN}" = true ]; then
@@ -228,10 +242,13 @@ if [ "${VERBOSE}" = true ]; then
   MAKE_SETTINGS="${MAKE_SETTINGS} VERBOSE=1"
 fi
 
-# source the environment file for this platform/compiler combination, then build the code
-printf "... Source ENV_FILE and create BUILD directory ...\n"
-module use ${SRC_DIR}/env
-. ${ENV_FILE}
+# Before we go on load modules, we first need to activate Lmod for some systems
+source ${SRC_DIR}/etc/lmod-setup.sh
+
+# source the module file for this platform/compiler combination, then build the code
+printf "... Load MODULE_FILE and create BUILD directory ...\n"
+module use ${SRC_DIR}/modulefiles
+module load ${MODULE_FILE}
 module list
 mkdir -p ${BUILD_DIR}
 cd ${BUILD_DIR}
