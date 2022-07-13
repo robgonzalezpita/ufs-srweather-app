@@ -33,7 +33,7 @@ On cheyenne:
 
 ```
 cd test
-./build.sh cheyenne >& build.out &
+./build.sh >& build.out &
 ```
 
 Check the ``${SR_WX_APP_TOP_DIR}/test/build_test$PID.out`` file for PASS/FAIL.
