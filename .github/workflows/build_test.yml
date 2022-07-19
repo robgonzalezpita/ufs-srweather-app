@@ -28,6 +28,7 @@ jobs:
 
       - name: Verify Branch 
         run: |
+          cd ufs-srweather-app-${{ github.run_id }}
           git branch -a
   
   Build_SRWA:
